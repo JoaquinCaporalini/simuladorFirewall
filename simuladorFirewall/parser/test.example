@@ -1,0 +1,12 @@
+INIT_RULES
+-t filter -A INPUT;
+-A OUTPUT;
+-t nat -A OUTPUT -p udp, tcp;
+-t nat -A INPUT -p udp, tcp --dport 109 -j DROP;
+
+-A FORDWARD -s 192.168.0.1/16;
+END_RULES
+
+INIT_HOST END_HOST
+
+INIT_PACKAGES END_PACKAGES

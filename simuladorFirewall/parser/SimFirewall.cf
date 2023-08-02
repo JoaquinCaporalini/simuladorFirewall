@@ -1,0 +1,128 @@
+-- bnfc -m --haskell SimFirewall.cf
+comment "#" ;
+comment "#/" "/#" ;
+
+Prog. Program ::= [Function];
+
+Rules.    Function ::= "INIT_RULES" [Rule] "END_RULES";
+Host.     Function ::= "INIT_HOST" [Inter] "END_HOST";
+Packages. Function ::= "INIT_PACKAGES" [Package] "END_PACKAGES";
+
+Rul. Rule ::= Tab Com Mat Target";" ;
+Intrface. Inter ::= "interfaz" String "ip" Ip "mac" String ";";
+
+Tcp.  Package ::= "TCP" "state" IntEstTCP "src" Ip "src-mac" String "dst" Ip "spot" Integer "dport" Integer "ttl" Integer "Use" Integer ";";
+Udp.  Package ::= "UDP" "src" Ip "src-mac" String "dst" Ip "spot" Integer "dport" Integer "Use" Integer ";";
+Icmp. Package ::= "ICMP" "src" Ip "src-mac" String "dst" Ip "stype" Integer "scode" Integer "sid" Integer "dtype" Integer "dcode" Integer "did" Integer  "Use" Integer ";";
+
+terminator Function "";
+terminator Rule "";
+terminator Inter "";
+terminator Package "";
+terminator Tab "";
+terminator Com "";
+terminator Mat "";
+
+-- Tablas
+TNat. Tab ::= "-t" "nat";
+TMan. Tab ::= "-t" "mangle";
+TFil. Tab ::= "-t" "filter";
+TFil. Tab ::= "";
+
+-- Comando a aplicar sobre la tabla
+CApp. Com ::= "-A" Cha; -- Agregar al final
+CDel. Com ::= "-D" Cha; -- Eliminar
+CRep. Com ::= "-R" Cha Integer; 
+                        -- remplazar
+CIns. Com ::= "-I" Cha Integer; 
+                        -- Inserta en una posicion
+-- CLis. Com ::= "-L" Cha;
+CFlu. Com ::= "-F" Cha; -- Vacia las reglas de una tabla
+-- Czer. Com ::= "-Z" Cha; -- En 0 los contadores
+-- CNew. Com ::= "-N" Cha; -- Deprecated
+-- CDch. Com ::= "-X" Cha; -- Deprecated
+CPol. Com ::= "-P" Cha Target; -- Establece una politica por defecto
+-- CEna. Com ::= "-E" Cha; -- Deprecated
+CNil. Com ::= "";       -- sin comando
+
+-- Sobre que cadena se aplica el comando
+DInp. Cha ::= "INPUT";
+DOut. Cha ::= "OUTPUT";
+DFor. Cha ::= "FORDWARD";
+
+-- Comparacion a realizar (el match que buscamos)
+MPro.    Mat ::= "-p" [Protocolo] [Pop];
+MNPro.   Mat ::= "-p" "!" [Protocolo] [Pop];
+MSrc.    Mat ::= "-s" Ip;
+MDst.    Mat ::= "-d" Ip;
+MInt.    Mat ::= "-i" String;
+MOut.    Mat ::= "-o" String;
+MFra.    Mat ::= "-f";
+MNFra.   Mat ::= "-f" "!";
+MState.  Mat ::= "-m" "--state" State;
+MMacS.   Mat ::= "-m" "mac" "--mac-sourse" String;
+MNMacS.  Mat ::= "-m" "mac" "--mac-sourse" "!" String;
+MNil.    Mat ::= "";
+
+separator Protocolo "," ;
+
+-- Protocolo de comunicacion que se usa
+PUdp.  Protocolo ::= "udp"  ;
+PTcp.  Protocolo ::= "tcp"  ;
+PIcmp. Protocolo ::= "icmp" ;
+PAll.  Protocolo ::= "all"  ;
+
+-- Formatos de IP
+IpR. Ip ::= Integer "." Integer "." Integer "." Integer "/" Integer;
+IpU. Ip ::= Integer "." Integer "." Integer "." Integer;
+
+separator Pop "," ;
+-- separator TCPop "," ;
+separator Flags "," ;
+separator State "," ;
+separator Target "," ;
+
+-- Operacaiones para los protocolos de comunicacion
+ODPortS.   Pop ::= "--dport" Integer;
+ONDPortS.  Pop ::= "--dport" "!" Integer;
+OSPortS.   Pop ::= "--sport" Integer;
+ONSPortS.  Pop ::= "--sport" "!" Integer;
+ODPortR.   Pop ::= "--dport" Integer ":" Integer;
+ONDPortR.  Pop ::= "--dport" "!" Integer ":" Integer;
+OSPortR.   Pop ::= "--sport" Integer ":" Integer;
+ONSPortR.  Pop ::= "--sport" "!" Integer ":" Integer;
+OTCPFlag.  Pop ::= "--tcp-flags" Flags;
+OTCPNFlag. Pop ::= "--tcp-flags" "!" Flags;
+OTCPNFlag. Pop ::= "--tcp-flags" "!" Flags;
+OICMPFlag. Pop ::= "--icmp-type" Flags;
+OICMPNFlag. Pop ::= "--icmp-type" "!" Flags;
+ONil.      Pop ::= "";
+
+-- Estado de la coneccion.
+FSYN. Flags ::= "SYN";
+FFIN. Flags ::= "FIN";
+FACK. Flags ::= "ACK";
+
+SNew. State ::= "NEW";
+SInv. State ::= "INVALID";
+SEst. State ::= "ESTABLISHED";
+SRel. State ::= "RELATED";
+
+TgAccept. Target ::= "-j" "ACCEPT";
+TgDrop.   Target ::= "-j" "DROP"; 
+TgRegect. Target ::= "-j" "REGECT";
+TgReturn. Target ::= "-j" "RETURN";
+TgNill.   Target ::= "";
+
+-- Estado internos de los paquetes TCP
+terminator IntEstTCP "";
+None.        IntEstTCP ::= "NONE";
+Established. IntEstTCP ::= "ESTABLISHED";
+SynSent.     IntEstTCP ::= "SYN_SENT";
+SynRecv.     IntEstTCP ::= "SYN_RECV";
+FinWait.     IntEstTCP ::= "FIN_WAIT";
+TimeWait.    IntEstTCP ::= "TIME_WAIT";
+Close.       IntEstTCP ::= "CLOSE";
+CloseWait.   IntEstTCP ::= "CLOSE_WAIT";
+LastAck.     IntEstTCP ::= "LAST_ACK";
+Listen.      IntEstTCP ::= "LISTEN";
