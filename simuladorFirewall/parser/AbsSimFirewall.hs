@@ -37,7 +37,7 @@ data Com
     | CRep Cha Integer
     | CIns Cha Integer
     | CFlu Cha
-    | CPol Cha Target
+    | CPol Target
     | CNil
   deriving (Eq, Ord, Show, Read)
 

@@ -45,7 +45,7 @@ CFlu. Com ::= "-F" Cha; -- Vacia las reglas de una tabla
 -- Czer. Com ::= "-Z" Cha; -- En 0 los contadores
 -- CNew. Com ::= "-N" Cha; -- Deprecated
 -- CDch. Com ::= "-X" Cha; -- Deprecated
-CPol. Com ::= "-P" Cha Target; -- Establece una politica por defecto
+CPol. Com ::= "-P" Target; -- Establece una politica por defecto
 -- CEna. Com ::= "-E" Cha; -- Deprecated
 CNil. Com ::= "";       -- sin comando
 

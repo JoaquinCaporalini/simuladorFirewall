@@ -183,7 +183,7 @@ Com : '-A' Cha { AbsSimFirewall.CApp $2 }
     | '-R' Cha Integer { AbsSimFirewall.CRep $2 $3 }
     | '-I' Cha Integer { AbsSimFirewall.CIns $2 $3 }
     | '-F' Cha { AbsSimFirewall.CFlu $2 }
-    | '-P' Cha Target { AbsSimFirewall.CPol $2 $3 }
+    | '-P' Target { AbsSimFirewall.CPol $2 }
     | {- empty -} { AbsSimFirewall.CNil }
 Cha :: { Cha }
 Cha : 'INPUT' { AbsSimFirewall.DInp }

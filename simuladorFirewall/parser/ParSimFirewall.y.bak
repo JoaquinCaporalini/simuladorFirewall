@@ -238,8 +238,8 @@ Pop : '--dport' Integer { AbsSimFirewall.ODPortS $2 }
     | '--tcp-flags' IntEstTCP { AbsSimFirewall.OTCPFlag $2 }
     | '--tcp-flags' '!' IntEstTCP { AbsSimFirewall.OTCPNFlag $3 }
     | '--tcp-flags' '!' IntEstTCP { AbsSimFirewall.OTCPNFlag $3 }
-    | '--icmp-type' IntEstTCP { AbsSimFirewall.OICMPFlag $2 }
-    | '--icmp-type' '!' IntEstTCP { AbsSimFirewall.OICMPNFlag $3 }
+    | '--icmp-type' Integer { AbsSimFirewall.OICMPFlag $2 }
+    | '--icmp-type' '!' Integer { AbsSimFirewall.OICMPNFlag $3 }
     | {- empty -} { AbsSimFirewall.ONil }
 State :: { State }
 State : 'NEW' { AbsSimFirewall.SNew }

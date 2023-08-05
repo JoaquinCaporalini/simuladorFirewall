@@ -1,12 +1,14 @@
+INIT_HOST
+interfaz "ens33" ip 192.168.100.7 mac "00:0c:29:f7:5c:ae";
+END_HOST
+INIT_CONNECTIONS
+ip 192.168.100.7 puerto 8080 ip 192.168.100.11 puerto 5 state ESTABLISHED;
+END_CONNECTIONS
 INIT_RULES
--t filter -A INPUT;
--A OUTPUT;
--t nat -A OUTPUT -p udp, tcp;
--t nat -A INPUT -p udp, tcp --dport 109 -j DROP;
-
--A FORDWARD -s 192.168.0.1/16;
+-t mangle -P -j ACCEPT;
+-t nat -P -j ACCEPT;
+-t filter -P -j ACCEPT;
 END_RULES
-
-INIT_HOST END_HOST
-
-INIT_PACKAGES END_PACKAGES
+INIT_PACKAGES
+TCP state ESTABLISHED src 192.168.100.7 src-mac "00:0c:29:f7:5c:ae" dst 192.168.100.7 spot 8080 dport 5 ttl 55 Use 1 interfaz "ens33"  ;
+END_PACKAGES

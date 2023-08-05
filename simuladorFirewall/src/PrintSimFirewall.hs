@@ -166,7 +166,7 @@ instance Print AbsSimFirewall.Com where
     AbsSimFirewall.CRep cha n -> prPrec i 0 (concatD [doc (showString "-R"), prt 0 cha, prt 0 n])
     AbsSimFirewall.CIns cha n -> prPrec i 0 (concatD [doc (showString "-I"), prt 0 cha, prt 0 n])
     AbsSimFirewall.CFlu cha -> prPrec i 0 (concatD [doc (showString "-F"), prt 0 cha])
-    AbsSimFirewall.CPol cha target -> prPrec i 0 (concatD [doc (showString "-P"), prt 0 cha, prt 0 target])
+    AbsSimFirewall.CPol target -> prPrec i 0 (concatD [doc (showString "-P"), prt 0 target])
     AbsSimFirewall.CNil -> prPrec i 0 (concatD [])
   prtList _ [] = concatD []
   prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]

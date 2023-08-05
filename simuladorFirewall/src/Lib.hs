@@ -15,9 +15,9 @@ verificarIp' (IpU n1 n2 n3 n4) = verificarIp n1 n2 n3 n4 0
 verificarMac :: [Char] -> Bool
 verificarMac [] = True
 verificarMac (m1:m2:m3:ms) = elem m1 ls && elem m2 ls && m3 == ':' && verificarMac ms
-    where ls = "0123456789ABCDFE"
+    where ls = "0123456789ABCDFEabcdef"
 verificarMac (m1:m2:ms) = elem m1 ls && elem m2 ls && verificarMac ms
-    where ls = "0123456789ABCDFE"
+    where ls = "0123456789ABCDFEabcdef"
 verificarMac _ = False
 
 -- sourceIp

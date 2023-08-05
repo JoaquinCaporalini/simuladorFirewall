@@ -15,11 +15,11 @@ eval s@(State t [] i c) = s
 eval s@(State t (p:ls) i c) =
     let (State t' ls' i' c') = eval (State t ls i c)
     in if isFromLocal p i
-       then State t' (fromLocal s : ls') i' c'-- Creado localmente
-       else State t' (fromOther s : ls') i' c'-- Recibido
+       then State t' (fromLocal p s : ls') i' c'-- Creado localmente
+       else State t' (fromOther p s : ls') i' c'-- Recibido
 
-fromLocal = undefined
-fromOther = undefined
+fromLocal = filtroMangleOutput
+fromOther = filtroManglePrerouting
 
 -- Verifica que un paquete sea de creacion local
 isFromLocal :: (Package, StatusPackege) -> [Interfaz] -> Bool

@@ -44,7 +44,7 @@ transCom x = case x of
   CRep cha integer -> failure x
   CIns cha integer -> failure x
   CFlu cha -> failure x
-  CPol cha target -> failure x
+  CPol target -> failure x
   CNil -> failure x
 transCha :: Cha -> Result
 transCha x = case x of

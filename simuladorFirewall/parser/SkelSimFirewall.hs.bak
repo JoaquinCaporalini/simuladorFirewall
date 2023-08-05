@@ -87,8 +87,8 @@ transPop x = case x of
   ONSPortR integer1 integer2 -> failure x
   OTCPFlag intesttcp -> failure x
   OTCPNFlag intesttcp -> failure x
-  OICMPFlag intesttcp -> failure x
-  OICMPNFlag intesttcp -> failure x
+  OICMPFlag integer -> failure x
+  OICMPNFlag integer -> failure x
   ONil -> failure x
 transState :: State -> Result
 transState x = case x of

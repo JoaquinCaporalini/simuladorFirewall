@@ -79,7 +79,7 @@ addTabla (CFlu a) r t =
 -- addTabla (Czer a) r t = t
 -- addTabla (CNew a) r t = t
 -- addTabla (CDch a) r t = t
-addTabla (CPol a p) r t = Chain (input t) (output t) (fordware t) (prerouting t) (postrouting t) p
+addTabla (CPol p) r t = Chain (input t) (output t) (fordware t) (prerouting t) (postrouting t) p
 -- addTabla (CEna a) r t = t
 
 addChain :: Cha -> Chain -> ([(Mat, Target)] -> [(Mat, Target)]) -> Chain

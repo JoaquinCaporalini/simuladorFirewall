@@ -96,7 +96,7 @@ All other symbols are terminals.
   |  |  **|**  | ``-R`` //Cha// //Integer//
   |  |  **|**  | ``-I`` //Cha// //Integer//
   |  |  **|**  | ``-F`` //Cha//
-  |  |  **|**  | ``-P`` //Cha// //Target//
+  |  |  **|**  | ``-P`` //Target//
   |  |  **|**  | **eps**
   | //Cha// | -> | ``INPUT``
   |  |  **|**  | ``OUTPUT``

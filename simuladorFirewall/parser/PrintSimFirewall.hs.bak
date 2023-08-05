@@ -233,8 +233,8 @@ instance Print AbsSimFirewall.Pop where
     AbsSimFirewall.ONSPortR n1 n2 -> prPrec i 0 (concatD [doc (showString "--sport"), doc (showString "!"), prt 0 n1, doc (showString ":"), prt 0 n2])
     AbsSimFirewall.OTCPFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--tcp-flags"), prt 0 intesttcp])
     AbsSimFirewall.OTCPNFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--tcp-flags"), doc (showString "!"), prt 0 intesttcp])
-    AbsSimFirewall.OICMPFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--icmp-type"), prt 0 intesttcp])
-    AbsSimFirewall.OICMPNFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--icmp-type"), doc (showString "!"), prt 0 intesttcp])
+    AbsSimFirewall.OICMPFlag n -> prPrec i 0 (concatD [doc (showString "--icmp-type"), prt 0 n])
+    AbsSimFirewall.OICMPNFlag n -> prPrec i 0 (concatD [doc (showString "--icmp-type"), doc (showString "!"), prt 0 n])
     AbsSimFirewall.ONil -> prPrec i 0 (concatD [])
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]

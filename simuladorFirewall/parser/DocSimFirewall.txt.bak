@@ -142,8 +142,8 @@ All other symbols are terminals.
   |  |  **|**  | ``--tcp-flags`` //IntEstTCP//
   |  |  **|**  | ``--tcp-flags`` ``!`` //IntEstTCP//
   |  |  **|**  | ``--tcp-flags`` ``!`` //IntEstTCP//
-  |  |  **|**  | ``--icmp-type`` //IntEstTCP//
-  |  |  **|**  | ``--icmp-type`` ``!`` //IntEstTCP//
+  |  |  **|**  | ``--icmp-type`` //Integer//
+  |  |  **|**  | ``--icmp-type`` ``!`` //Integer//
   |  |  **|**  | **eps**
   | //State// | -> | ``NEW``
   |  |  **|**  | ``INVALID``

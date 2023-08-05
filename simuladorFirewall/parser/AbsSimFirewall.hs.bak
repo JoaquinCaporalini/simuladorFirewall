@@ -76,8 +76,8 @@ data Pop
     | ONSPortR Integer Integer
     | OTCPFlag IntEstTCP
     | OTCPNFlag IntEstTCP
-    | OICMPFlag IntEstTCP
-    | OICMPNFlag IntEstTCP
+    | OICMPFlag Integer
+    | OICMPNFlag Integer
     | ONil
   deriving (Eq, Ord, Show, Read)
 
