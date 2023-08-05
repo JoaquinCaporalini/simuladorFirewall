@@ -46,14 +46,18 @@ run v p s = let ts = myLLexer s in case p ts of
                           exitSuccess
 
 showTree' :: Either Common.State String -> String
-showTree' (Left s) = show (eval s)
+showTree' (Left s) = 
+  let (State t p i c) =  eval s
+      f [] _ = ""
+      f ((p', s'):xs) n = 
+        "\n--> Paquete: " ++ show n ++ " Estado: " ++ show s' ++ "\n" ++ show p' ++ f xs (n+1) ++ "\n"
+  in f p 0
 showTree' (Right e) = show e
 
 showTree ::   Int -> Program -> IO ()
 showTree v tree
  = do
-      putStrV v $ "\n[Abstract Syntax]\n\n" ++ showTree' (loadFile tree)
-      putStrV v $ "\n[Linearized tree]\n\n" ++ printTree tree
+      putStrV v $ showTree' (loadFile tree)
 
 usage :: IO ()
 usage = do

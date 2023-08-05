@@ -119,7 +119,7 @@ filtroNatOutput (p, st) s@(State t ps hs cs) =
 -- Trersera etapa de un paquete local que debe enviarse
 filtroFilterOutput :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
 filtroFilterOutput (p, st) s@(State t ps hs cs) =
-    case checkIn p (output (nat t)) (politica (nat t)) hs cs of
+    case checkIn p (output (filterT t)) (politica (filterT t)) hs cs of
         Check -> filtroManglePostrouting (p, ForCheck) s--id (p, Pass) t
         st' -> (p, st')
 
@@ -127,6 +127,7 @@ filtroFilterOutput (p, st) s@(State t ps hs cs) =
 -- 
 -- 
 
+--Cambiar
 -- checkIn: Verifica si verifica alguna de las regla y aplica la accion correspondiente.
 checkIn :: Package -> [(Mat, Target)] -> Target -> [Interfaz] -> [Connection] -> StatusPackege
 checkIn _ [] t hs cs = targetToStatusPackege t
@@ -134,6 +135,7 @@ checkIn p (x:xs) t hs cs =
     case aplicaRegla p x t hs cs of
         ForCheck -> checkIn p xs t hs cs
         e -> e
+-- Cambiar
 -- aplicaRegla: Verifica si cumple una regla espesifica y aplica su accion
 aplicaRegla :: Package -> (Mat, Target) -> Target -> [Interfaz] -> [Connection] -> StatusPackege
 aplicaRegla p (MPro ps xs, t) def hs cs =
@@ -265,6 +267,6 @@ checkOp' (Icmp _ _ _ s _ _ _ _ _ _ _) (OICMPFlag f) = f == s
 checkOp' p (OICMPFlag f) = False
 checkOp' (Icmp _ _ _ s _ _ _ _ _ _ _) (OICMPNFlag f) = f /= s
 checkOp' p (OICMPNFlag f) = False
-checkOp' p ONil = False
+checkOp' p ONil = True
 
 -- f ip x = ip + (2 ^ (8 - x) - 1)
