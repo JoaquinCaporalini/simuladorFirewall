@@ -32,6 +32,7 @@ library
       Ip
       LexSimFirewall
       Lib
+      LoadFile
       ParSimFirewall
       PrintSimFirewall
       SkelSimFirewall

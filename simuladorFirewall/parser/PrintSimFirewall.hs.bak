@@ -96,7 +96,14 @@ instance Print AbsSimFirewall.Function where
   prt i e = case e of
     AbsSimFirewall.Rules rules -> prPrec i 0 (concatD [doc (showString "INIT_RULES"), prt 0 rules, doc (showString "END_RULES")])
     AbsSimFirewall.Host inters -> prPrec i 0 (concatD [doc (showString "INIT_HOST"), prt 0 inters, doc (showString "END_HOST")])
-    AbsSimFirewall.Packages pinfos -> prPrec i 0 (concatD [doc (showString "INIT_PACKAGES"), prt 0 pinfos, doc (showString "END_PACKAGES")])
+    AbsSimFirewall.Packages packages -> prPrec i 0 (concatD [doc (showString "INIT_PACKAGES"), prt 0 packages, doc (showString "END_PACKAGES")])
+    AbsSimFirewall.Connections connections -> prPrec i 0 (concatD [doc (showString "INIT_CONNECTIONS"), prt 0 connections, doc (showString "END_CONNECTIONS")])
+  prtList _ [] = concatD []
+  prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]
+
+instance Print AbsSimFirewall.Connection where
+  prt i e = case e of
+    AbsSimFirewall.C ip1 n1 ip2 n2 state -> prPrec i 0 (concatD [doc (showString "ip"), prt 0 ip1, doc (showString "puerto"), prt 0 n1, doc (showString "ip"), prt 0 ip2, doc (showString "puerto"), prt 0 n2, doc (showString "state"), prt 0 state, doc (showString ";")])
   prtList _ [] = concatD []
   prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]
 
@@ -112,15 +119,18 @@ instance Print AbsSimFirewall.Inter where
   prtList _ [] = concatD []
   prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]
 
-instance Print AbsSimFirewall.PInfo where
+instance Print AbsSimFirewall.Package where
   prt i e = case e of
-    AbsSimFirewall.PInfoTcp intesttcp ip1 str ip2 n1 n2 n3 n4 -> prPrec i 0 (concatD [doc (showString "TCP"), doc (showString "state"), prt 0 intesttcp, doc (showString "src"), prt 0 ip1, doc (showString "src-mac"), prt 0 str, doc (showString "dst"), prt 0 ip2, doc (showString "spot"), prt 0 n1, doc (showString "dport"), prt 0 n2, doc (showString "ttl"), prt 0 n3, doc (showString "Use"), prt 0 n4, doc (showString ";")])
-    AbsSimFirewall.PInfoUdp ip1 str ip2 n1 n2 n3 -> prPrec i 0 (concatD [doc (showString "UDP"), doc (showString "src"), prt 0 ip1, doc (showString "src-mac"), prt 0 str, doc (showString "dst"), prt 0 ip2, doc (showString "spot"), prt 0 n1, doc (showString "dport"), prt 0 n2, doc (showString "Use"), prt 0 n3, doc (showString ";")])
-    AbsSimFirewall.PInfoIcmp ip1 str ip2 n1 n2 n3 n4 n5 n6 n7 -> prPrec i 0 (concatD [doc (showString "ICMP"), doc (showString "src"), prt 0 ip1, doc (showString "src-mac"), prt 0 str, doc (showString "dst"), prt 0 ip2, doc (showString "stype"), prt 0 n1, doc (showString "scode"), prt 0 n2, doc (showString "sid"), prt 0 n3, doc (showString "dtype"), prt 0 n4, doc (showString "dcode"), prt 0 n5, doc (showString "did"), prt 0 n6, doc (showString "Use"), prt 0 n7, doc (showString ";")])
+    AbsSimFirewall.Tcp intesttcp ip1 str1 ip2 n1 n2 n3 n4 str2 -> prPrec i 0 (concatD [doc (showString "TCP"), doc (showString "state"), prt 0 intesttcp, doc (showString "src"), prt 0 ip1, doc (showString "src-mac"), prt 0 str1, doc (showString "dst"), prt 0 ip2, doc (showString "spot"), prt 0 n1, doc (showString "dport"), prt 0 n2, doc (showString "ttl"), prt 0 n3, doc (showString "Use"), prt 0 n4, doc (showString "interfaz"), prt 0 str2, doc (showString ";")])
+    AbsSimFirewall.Udp ip1 str1 ip2 n1 n2 n3 str2 -> prPrec i 0 (concatD [doc (showString "UDP"), doc (showString "src"), prt 0 ip1, doc (showString "src-mac"), prt 0 str1, doc (showString "dst"), prt 0 ip2, doc (showString "spot"), prt 0 n1, doc (showString "dport"), prt 0 n2, doc (showString "Use"), prt 0 n3, doc (showString "interfaz"), prt 0 str2, doc (showString ";")])
+    AbsSimFirewall.Icmp ip1 str1 ip2 n1 n2 n3 n4 n5 n6 n7 str2 -> prPrec i 0 (concatD [doc (showString "ICMP"), doc (showString "src"), prt 0 ip1, doc (showString "src-mac"), prt 0 str1, doc (showString "dst"), prt 0 ip2, doc (showString "stype"), prt 0 n1, doc (showString "scode"), prt 0 n2, doc (showString "sid"), prt 0 n3, doc (showString "dtype"), prt 0 n4, doc (showString "dcode"), prt 0 n5, doc (showString "did"), prt 0 n6, doc (showString "Use"), prt 0 n7, doc (showString "interfaz"), prt 0 str2, doc (showString ";")])
   prtList _ [] = concatD []
   prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]
 
 instance Print [AbsSimFirewall.Function] where
+  prt = prtList
+
+instance Print [AbsSimFirewall.Connection] where
   prt = prtList
 
 instance Print [AbsSimFirewall.Rule] where
@@ -129,7 +139,7 @@ instance Print [AbsSimFirewall.Rule] where
 instance Print [AbsSimFirewall.Inter] where
   prt = prtList
 
-instance Print [AbsSimFirewall.PInfo] where
+instance Print [AbsSimFirewall.Package] where
   prt = prtList
 
 instance Print [AbsSimFirewall.Tab] where
@@ -166,6 +176,8 @@ instance Print AbsSimFirewall.Cha where
     AbsSimFirewall.DInp -> prPrec i 0 (concatD [doc (showString "INPUT")])
     AbsSimFirewall.DOut -> prPrec i 0 (concatD [doc (showString "OUTPUT")])
     AbsSimFirewall.DFor -> prPrec i 0 (concatD [doc (showString "FORDWARD")])
+    AbsSimFirewall.DPre -> prPrec i 0 (concatD [doc (showString "PREROUTING")])
+    AbsSimFirewall.DPos -> prPrec i 0 (concatD [doc (showString "POSTROUTING")])
 
 instance Print AbsSimFirewall.Mat where
   prt i e = case e of
@@ -175,11 +187,9 @@ instance Print AbsSimFirewall.Mat where
     AbsSimFirewall.MDst ip -> prPrec i 0 (concatD [doc (showString "-d"), prt 0 ip])
     AbsSimFirewall.MInt str -> prPrec i 0 (concatD [doc (showString "-i"), prt 0 str])
     AbsSimFirewall.MOut str -> prPrec i 0 (concatD [doc (showString "-o"), prt 0 str])
-    AbsSimFirewall.MFra -> prPrec i 0 (concatD [doc (showString "-f")])
-    AbsSimFirewall.MNFra -> prPrec i 0 (concatD [doc (showString "-f"), doc (showString "!")])
     AbsSimFirewall.MState state -> prPrec i 0 (concatD [doc (showString "-m"), doc (showString "--state"), prt 0 state])
-    AbsSimFirewall.MMacS -> prPrec i 0 (concatD [doc (showString "-m"), doc (showString "mac"), doc (showString "--mac-sourse")])
-    AbsSimFirewall.MNMacS -> prPrec i 0 (concatD [doc (showString "-m"), doc (showString "mac"), doc (showString "--mac-sourse"), doc (showString "!")])
+    AbsSimFirewall.MMacS str -> prPrec i 0 (concatD [doc (showString "-m"), doc (showString "mac"), doc (showString "--mac-sourse"), prt 0 str])
+    AbsSimFirewall.MNMacS str -> prPrec i 0 (concatD [doc (showString "-m"), doc (showString "mac"), doc (showString "--mac-sourse"), doc (showString "!"), prt 0 str])
     AbsSimFirewall.MNil -> prPrec i 0 (concatD [])
   prtList _ [] = concatD []
   prtList _ (x:xs) = concatD [prt 0 x, prt 0 xs]
@@ -205,9 +215,6 @@ instance Print AbsSimFirewall.Ip where
 instance Print [AbsSimFirewall.Pop] where
   prt = prtList
 
-instance Print [AbsSimFirewall.Flags] where
-  prt = prtList
-
 instance Print [AbsSimFirewall.State] where
   prt = prtList
 
@@ -224,20 +231,11 @@ instance Print AbsSimFirewall.Pop where
     AbsSimFirewall.ONDPortR n1 n2 -> prPrec i 0 (concatD [doc (showString "--dport"), doc (showString "!"), prt 0 n1, doc (showString ":"), prt 0 n2])
     AbsSimFirewall.OSPortR n1 n2 -> prPrec i 0 (concatD [doc (showString "--sport"), prt 0 n1, doc (showString ":"), prt 0 n2])
     AbsSimFirewall.ONSPortR n1 n2 -> prPrec i 0 (concatD [doc (showString "--sport"), doc (showString "!"), prt 0 n1, doc (showString ":"), prt 0 n2])
-    AbsSimFirewall.OTCPFlag flags -> prPrec i 0 (concatD [doc (showString "--tcp-flags"), prt 0 flags])
-    AbsSimFirewall.OTCPNFlag flags -> prPrec i 0 (concatD [doc (showString "--tcp-flags"), doc (showString "!"), prt 0 flags])
-    AbsSimFirewall.OICMPFlag flags -> prPrec i 0 (concatD [doc (showString "--icmp-type"), prt 0 flags])
-    AbsSimFirewall.OICMPNFlag flags -> prPrec i 0 (concatD [doc (showString "--icmp-type"), doc (showString "!"), prt 0 flags])
+    AbsSimFirewall.OTCPFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--tcp-flags"), prt 0 intesttcp])
+    AbsSimFirewall.OTCPNFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--tcp-flags"), doc (showString "!"), prt 0 intesttcp])
+    AbsSimFirewall.OICMPFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--icmp-type"), prt 0 intesttcp])
+    AbsSimFirewall.OICMPNFlag intesttcp -> prPrec i 0 (concatD [doc (showString "--icmp-type"), doc (showString "!"), prt 0 intesttcp])
     AbsSimFirewall.ONil -> prPrec i 0 (concatD [])
-  prtList _ [] = concatD []
-  prtList _ [x] = concatD [prt 0 x]
-  prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]
-
-instance Print AbsSimFirewall.Flags where
-  prt i e = case e of
-    AbsSimFirewall.FSYN -> prPrec i 0 (concatD [doc (showString "SYN")])
-    AbsSimFirewall.FFIN -> prPrec i 0 (concatD [doc (showString "FIN")])
-    AbsSimFirewall.FACK -> prPrec i 0 (concatD [doc (showString "ACK")])
   prtList _ [] = concatD []
   prtList _ [x] = concatD [prt 0 x]
   prtList _ (x:xs) = concatD [prt 0 x, doc (showString ","), prt 0 xs]

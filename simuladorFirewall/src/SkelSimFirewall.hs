@@ -17,6 +17,10 @@ transFunction x = case x of
   Rules rules -> failure x
   Host inters -> failure x
   Packages packages -> failure x
+  Connections connections -> failure x
+transConnection :: Connection -> Result
+transConnection x = case x of
+  C ip1 integer1 ip2 integer2 state -> failure x
 transRule :: Rule -> Result
 transRule x = case x of
   Rul tab com mat target -> failure x
@@ -25,9 +29,9 @@ transInter x = case x of
   Intrface string1 ip string2 -> failure x
 transPackage :: Package -> Result
 transPackage x = case x of
-  Tcp intesttcp ip1 string ip2 integer1 integer2 integer3 integer4 -> failure x
-  Udp ip1 string ip2 integer1 integer2 integer3 -> failure x
-  Icmp ip1 string ip2 integer1 integer2 integer3 integer4 integer5 integer6 integer7 -> failure x
+  Tcp intesttcp ip1 string1 ip2 integer1 integer2 integer3 integer4 string2 -> failure x
+  Udp ip1 string1 ip2 integer1 integer2 integer3 string2 -> failure x
+  Icmp ip1 string1 ip2 integer1 integer2 integer3 integer4 integer5 integer6 integer7 string2 -> failure x
 transTab :: Tab -> Result
 transTab x = case x of
   TNat -> failure x
@@ -47,6 +51,8 @@ transCha x = case x of
   DInp -> failure x
   DOut -> failure x
   DFor -> failure x
+  DPre -> failure x
+  DPos -> failure x
 transMat :: Mat -> Result
 transMat x = case x of
   MPro protocolos pops -> failure x
@@ -55,11 +61,9 @@ transMat x = case x of
   MDst ip -> failure x
   MInt string -> failure x
   MOut string -> failure x
-  MFra -> failure x
-  MNFra -> failure x
   MState state -> failure x
-  MMacS -> failure x
-  MNMacS -> failure x
+  MMacS string -> failure x
+  MNMacS string -> failure x
   MNil -> failure x
 transProtocolo :: Protocolo -> Result
 transProtocolo x = case x of
@@ -81,16 +85,11 @@ transPop x = case x of
   ONDPortR integer1 integer2 -> failure x
   OSPortR integer1 integer2 -> failure x
   ONSPortR integer1 integer2 -> failure x
-  OTCPFlag flags -> failure x
-  OTCPNFlag flags -> failure x
-  OICMPFlag flags -> failure x
-  OICMPNFlag flags -> failure x
+  OTCPFlag intesttcp -> failure x
+  OTCPNFlag intesttcp -> failure x
+  OICMPFlag integer -> failure x
+  OICMPNFlag integer -> failure x
   ONil -> failure x
-transFlags :: Flags -> Result
-transFlags x = case x of
-  FSYN -> failure x
-  FFIN -> failure x
-  FACK -> failure x
 transState :: State -> Result
 transState x = case x of
   SNew -> failure x

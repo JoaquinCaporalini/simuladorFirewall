@@ -10,10 +10,12 @@ import ErrM
 
 %name pProgram Program
 %name pFunction Function
+%name pConnection Connection
 %name pRule Rule
 %name pInter Inter
 %name pPackage Package
 %name pListFunction ListFunction
+%name pListConnection ListConnection
 %name pListRule ListRule
 %name pListInter ListInter
 %name pListPackage ListPackage
@@ -28,11 +30,9 @@ import ErrM
 %name pProtocolo Protocolo
 %name pIp Ip
 %name pListPop ListPop
-%name pListFlags ListFlags
 %name pListState ListState
 %name pListTarget ListTarget
 %name pPop Pop
-%name pFlags Flags
 %name pState State
 %name pTarget Target
 %name pListIntEstTCP ListIntEstTCP
@@ -56,45 +56,45 @@ import ErrM
   '-P' { PT _ (TS _ 13) }
   '-R' { PT _ (TS _ 14) }
   '-d' { PT _ (TS _ 15) }
-  '-f' { PT _ (TS _ 16) }
-  '-i' { PT _ (TS _ 17) }
-  '-j' { PT _ (TS _ 18) }
-  '-m' { PT _ (TS _ 19) }
-  '-o' { PT _ (TS _ 20) }
-  '-p' { PT _ (TS _ 21) }
-  '-s' { PT _ (TS _ 22) }
-  '-t' { PT _ (TS _ 23) }
-  '.' { PT _ (TS _ 24) }
-  '/' { PT _ (TS _ 25) }
-  ':' { PT _ (TS _ 26) }
-  ';' { PT _ (TS _ 27) }
-  'ACCEPT' { PT _ (TS _ 28) }
-  'ACK' { PT _ (TS _ 29) }
-  'CLOSE' { PT _ (TS _ 30) }
-  'CLOSE_WAIT' { PT _ (TS _ 31) }
-  'DROP' { PT _ (TS _ 32) }
-  'END_HOST' { PT _ (TS _ 33) }
-  'END_PACKAGES' { PT _ (TS _ 34) }
-  'END_RULES' { PT _ (TS _ 35) }
-  'ESTABLISHED' { PT _ (TS _ 36) }
-  'FIN' { PT _ (TS _ 37) }
-  'FIN_WAIT' { PT _ (TS _ 38) }
-  'FORDWARD' { PT _ (TS _ 39) }
-  'ICMP' { PT _ (TS _ 40) }
-  'INIT_HOST' { PT _ (TS _ 41) }
-  'INIT_PACKAGES' { PT _ (TS _ 42) }
-  'INIT_RULES' { PT _ (TS _ 43) }
-  'INPUT' { PT _ (TS _ 44) }
-  'INVALID' { PT _ (TS _ 45) }
-  'LAST_ACK' { PT _ (TS _ 46) }
-  'LISTEN' { PT _ (TS _ 47) }
-  'NEW' { PT _ (TS _ 48) }
-  'NONE' { PT _ (TS _ 49) }
-  'OUTPUT' { PT _ (TS _ 50) }
-  'REGECT' { PT _ (TS _ 51) }
-  'RELATED' { PT _ (TS _ 52) }
-  'RETURN' { PT _ (TS _ 53) }
-  'SYN' { PT _ (TS _ 54) }
+  '-i' { PT _ (TS _ 16) }
+  '-j' { PT _ (TS _ 17) }
+  '-m' { PT _ (TS _ 18) }
+  '-o' { PT _ (TS _ 19) }
+  '-p' { PT _ (TS _ 20) }
+  '-s' { PT _ (TS _ 21) }
+  '-t' { PT _ (TS _ 22) }
+  '.' { PT _ (TS _ 23) }
+  '/' { PT _ (TS _ 24) }
+  ':' { PT _ (TS _ 25) }
+  ';' { PT _ (TS _ 26) }
+  'ACCEPT' { PT _ (TS _ 27) }
+  'CLOSE' { PT _ (TS _ 28) }
+  'CLOSE_WAIT' { PT _ (TS _ 29) }
+  'DROP' { PT _ (TS _ 30) }
+  'END_CONNECTIONS' { PT _ (TS _ 31) }
+  'END_HOST' { PT _ (TS _ 32) }
+  'END_PACKAGES' { PT _ (TS _ 33) }
+  'END_RULES' { PT _ (TS _ 34) }
+  'ESTABLISHED' { PT _ (TS _ 35) }
+  'FIN_WAIT' { PT _ (TS _ 36) }
+  'FORDWARD' { PT _ (TS _ 37) }
+  'ICMP' { PT _ (TS _ 38) }
+  'INIT_CONNECTIONS' { PT _ (TS _ 39) }
+  'INIT_HOST' { PT _ (TS _ 40) }
+  'INIT_PACKAGES' { PT _ (TS _ 41) }
+  'INIT_RULES' { PT _ (TS _ 42) }
+  'INPUT' { PT _ (TS _ 43) }
+  'INVALID' { PT _ (TS _ 44) }
+  'LAST_ACK' { PT _ (TS _ 45) }
+  'LISTEN' { PT _ (TS _ 46) }
+  'NEW' { PT _ (TS _ 47) }
+  'NONE' { PT _ (TS _ 48) }
+  'OUTPUT' { PT _ (TS _ 49) }
+  'POSTROUTING' { PT _ (TS _ 50) }
+  'PREROUTING' { PT _ (TS _ 51) }
+  'REGECT' { PT _ (TS _ 52) }
+  'RELATED' { PT _ (TS _ 53) }
+  'RETURN' { PT _ (TS _ 54) }
   'SYN_RECV' { PT _ (TS _ 55) }
   'SYN_SENT' { PT _ (TS _ 56) }
   'TCP' { PT _ (TS _ 57) }
@@ -114,26 +114,27 @@ import ErrM
   'mac' { PT _ (TS _ 71) }
   'mangle' { PT _ (TS _ 72) }
   'nat' { PT _ (TS _ 73) }
-  'scode' { PT _ (TS _ 74) }
-  'sid' { PT _ (TS _ 75) }
-  'spot' { PT _ (TS _ 76) }
-  'src' { PT _ (TS _ 77) }
-  'src-mac' { PT _ (TS _ 78) }
-  'state' { PT _ (TS _ 79) }
-  'stype' { PT _ (TS _ 80) }
-  'tcp' { PT _ (TS _ 81) }
-  'ttl' { PT _ (TS _ 82) }
-  'udp' { PT _ (TS _ 83) }
-  L_quoted { PT _ (TL $$) }
+  'puerto' { PT _ (TS _ 74) }
+  'scode' { PT _ (TS _ 75) }
+  'sid' { PT _ (TS _ 76) }
+  'spot' { PT _ (TS _ 77) }
+  'src' { PT _ (TS _ 78) }
+  'src-mac' { PT _ (TS _ 79) }
+  'state' { PT _ (TS _ 80) }
+  'stype' { PT _ (TS _ 81) }
+  'tcp' { PT _ (TS _ 82) }
+  'ttl' { PT _ (TS _ 83) }
+  'udp' { PT _ (TS _ 84) }
   L_integ  { PT _ (TI $$) }
+  L_quoted { PT _ (TL $$) }
 
 %%
 
-String  :: { String }
-String   : L_quoted {  $1 }
-
 Integer :: { Integer }
 Integer  : L_integ  { (read ( $1)) :: Integer }
+
+String  :: { String }
+String   : L_quoted {  $1 }
 
 Program :: { Program }
 Program : ListFunction { AbsSimFirewall.Prog (reverse $1) }
@@ -141,17 +142,23 @@ Function :: { Function }
 Function : 'INIT_RULES' ListRule 'END_RULES' { AbsSimFirewall.Rules (reverse $2) }
          | 'INIT_HOST' ListInter 'END_HOST' { AbsSimFirewall.Host (reverse $2) }
          | 'INIT_PACKAGES' ListPackage 'END_PACKAGES' { AbsSimFirewall.Packages (reverse $2) }
+         | 'INIT_CONNECTIONS' ListConnection 'END_CONNECTIONS' { AbsSimFirewall.Connections (reverse $2) }
+Connection :: { Connection }
+Connection : 'ip' Ip 'puerto' Integer 'ip' Ip 'puerto' Integer 'state' State ';' { AbsSimFirewall.C $2 $4 $6 $8 $10 }
 Rule :: { Rule }
 Rule : Tab Com Mat Target ';' { AbsSimFirewall.Rul $1 $2 $3 $4 }
 Inter :: { Inter }
 Inter : 'interfaz' String 'ip' Ip 'mac' String ';' { AbsSimFirewall.Intrface $2 $4 $6 }
 Package :: { Package }
-Package : 'TCP' 'state' IntEstTCP 'src' Ip 'src-mac' String 'dst' Ip 'spot' Integer 'dport' Integer 'ttl' Integer 'Use' Integer ';' { AbsSimFirewall.Tcp $3 $5 $7 $9 $11 $13 $15 $17 }
-        | 'UDP' 'src' Ip 'src-mac' String 'dst' Ip 'spot' Integer 'dport' Integer 'Use' Integer ';' { AbsSimFirewall.Udp $3 $5 $7 $9 $11 $13 }
-        | 'ICMP' 'src' Ip 'src-mac' String 'dst' Ip 'stype' Integer 'scode' Integer 'sid' Integer 'dtype' Integer 'dcode' Integer 'did' Integer 'Use' Integer ';' { AbsSimFirewall.Icmp $3 $5 $7 $9 $11 $13 $15 $17 $19 $21 }
+Package : 'TCP' 'state' IntEstTCP 'src' Ip 'src-mac' String 'dst' Ip 'spot' Integer 'dport' Integer 'ttl' Integer 'Use' Integer 'interfaz' String ';' { AbsSimFirewall.Tcp $3 $5 $7 $9 $11 $13 $15 $17 $19 }
+        | 'UDP' 'src' Ip 'src-mac' String 'dst' Ip 'spot' Integer 'dport' Integer 'Use' Integer 'interfaz' String ';' { AbsSimFirewall.Udp $3 $5 $7 $9 $11 $13 $15 }
+        | 'ICMP' 'src' Ip 'src-mac' String 'dst' Ip 'stype' Integer 'scode' Integer 'sid' Integer 'dtype' Integer 'dcode' Integer 'did' Integer 'Use' Integer 'interfaz' String ';' { AbsSimFirewall.Icmp $3 $5 $7 $9 $11 $13 $15 $17 $19 $21 $23 }
 ListFunction :: { [Function] }
 ListFunction : {- empty -} { [] }
              | ListFunction Function { flip (:) $1 $2 }
+ListConnection :: { [Connection] }
+ListConnection : {- empty -} { [] }
+               | ListConnection Connection { flip (:) $1 $2 }
 ListRule :: { [Rule] }
 ListRule : {- empty -} { [] } | ListRule Rule { flip (:) $1 $2 }
 ListInter :: { [Inter] }
@@ -182,6 +189,8 @@ Cha :: { Cha }
 Cha : 'INPUT' { AbsSimFirewall.DInp }
     | 'OUTPUT' { AbsSimFirewall.DOut }
     | 'FORDWARD' { AbsSimFirewall.DFor }
+    | 'PREROUTING' { AbsSimFirewall.DPre }
+    | 'POSTROUTING' { AbsSimFirewall.DPos }
 Mat :: { Mat }
 Mat : '-p' ListProtocolo ListPop { AbsSimFirewall.MPro $2 $3 }
     | '-p' '!' ListProtocolo ListPop { AbsSimFirewall.MNPro $3 $4 }
@@ -189,11 +198,9 @@ Mat : '-p' ListProtocolo ListPop { AbsSimFirewall.MPro $2 $3 }
     | '-d' Ip { AbsSimFirewall.MDst $2 }
     | '-i' String { AbsSimFirewall.MInt $2 }
     | '-o' String { AbsSimFirewall.MOut $2 }
-    | '-f' { AbsSimFirewall.MFra }
-    | '-f' '!' { AbsSimFirewall.MNFra }
     | '-m' '--state' State { AbsSimFirewall.MState $3 }
-    | '-m' 'mac' '--mac-sourse' { AbsSimFirewall.MMacS }
-    | '-m' 'mac' '--mac-sourse' '!' { AbsSimFirewall.MNMacS }
+    | '-m' 'mac' '--mac-sourse' String { AbsSimFirewall.MMacS $4 }
+    | '-m' 'mac' '--mac-sourse' '!' String { AbsSimFirewall.MNMacS $5 }
     | {- empty -} { AbsSimFirewall.MNil }
 ListProtocolo :: { [Protocolo] }
 ListProtocolo : {- empty -} { [] }
@@ -211,10 +218,6 @@ ListPop :: { [Pop] }
 ListPop : {- empty -} { [] }
         | Pop { (:[]) $1 }
         | Pop ',' ListPop { (:) $1 $3 }
-ListFlags :: { [Flags] }
-ListFlags : {- empty -} { [] }
-          | Flags { (:[]) $1 }
-          | Flags ',' ListFlags { (:) $1 $3 }
 ListState :: { [State] }
 ListState : {- empty -} { [] }
           | State { (:[]) $1 }
@@ -232,16 +235,12 @@ Pop : '--dport' Integer { AbsSimFirewall.ODPortS $2 }
     | '--dport' '!' Integer ':' Integer { AbsSimFirewall.ONDPortR $3 $5 }
     | '--sport' Integer ':' Integer { AbsSimFirewall.OSPortR $2 $4 }
     | '--sport' '!' Integer ':' Integer { AbsSimFirewall.ONSPortR $3 $5 }
-    | '--tcp-flags' Flags { AbsSimFirewall.OTCPFlag $2 }
-    | '--tcp-flags' '!' Flags { AbsSimFirewall.OTCPNFlag $3 }
-    | '--tcp-flags' '!' Flags { AbsSimFirewall.OTCPNFlag $3 }
-    | '--icmp-type' Flags { AbsSimFirewall.OICMPFlag $2 }
-    | '--icmp-type' '!' Flags { AbsSimFirewall.OICMPNFlag $3 }
+    | '--tcp-flags' IntEstTCP { AbsSimFirewall.OTCPFlag $2 }
+    | '--tcp-flags' '!' IntEstTCP { AbsSimFirewall.OTCPNFlag $3 }
+    | '--tcp-flags' '!' IntEstTCP { AbsSimFirewall.OTCPNFlag $3 }
+    | '--icmp-type' Integer { AbsSimFirewall.OICMPFlag $2 }
+    | '--icmp-type' '!' Integer { AbsSimFirewall.OICMPNFlag $3 }
     | {- empty -} { AbsSimFirewall.ONil }
-Flags :: { Flags }
-Flags : 'SYN' { AbsSimFirewall.FSYN }
-      | 'FIN' { AbsSimFirewall.FFIN }
-      | 'ACK' { AbsSimFirewall.FACK }
 State :: { State }
 State : 'NEW' { AbsSimFirewall.SNew }
       | 'INVALID' { AbsSimFirewall.SInv }

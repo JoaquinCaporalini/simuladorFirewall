@@ -7,15 +7,19 @@ Prog. Program ::= [Function];
 Rules.    Function ::= "INIT_RULES" [Rule] "END_RULES";
 Host.     Function ::= "INIT_HOST" [Inter] "END_HOST";
 Packages. Function ::= "INIT_PACKAGES" [Package] "END_PACKAGES";
+Connections. Function ::= "INIT_CONNECTIONS" [Connection] "END_CONNECTIONS";
+
+C. Connection ::= "ip" Ip "puerto" Integer "ip" Ip "puerto" Integer "state" State ";";  
 
 Rul. Rule ::= Tab Com Mat Target";" ;
 Intrface. Inter ::= "interfaz" String "ip" Ip "mac" String ";";
 
-Tcp.  Package ::= "TCP" "state" IntEstTCP "src" Ip "src-mac" String "dst" Ip "spot" Integer "dport" Integer "ttl" Integer "Use" Integer ";";
-Udp.  Package ::= "UDP" "src" Ip "src-mac" String "dst" Ip "spot" Integer "dport" Integer "Use" Integer ";";
-Icmp. Package ::= "ICMP" "src" Ip "src-mac" String "dst" Ip "stype" Integer "scode" Integer "sid" Integer "dtype" Integer "dcode" Integer "did" Integer  "Use" Integer ";";
+Tcp.  Package ::= "TCP" "state" IntEstTCP "src" Ip "src-mac" String "dst" Ip "spot" Integer "dport" Integer "ttl" Integer "Use" Integer "interfaz" String ";";
+Udp.  Package ::= "UDP" "src" Ip "src-mac" String "dst" Ip "spot" Integer "dport" Integer "Use" Integer "interfaz" String ";";
+Icmp. Package ::= "ICMP" "src" Ip "src-mac" String "dst" Ip "stype" Integer "scode" Integer "sid" Integer "dtype" Integer "dcode" Integer "did" Integer  "Use" Integer "interfaz" String ";";
 
 terminator Function "";
+terminator Connection "";
 terminator Rule "";
 terminator Inter "";
 terminator Package "";
@@ -49,6 +53,8 @@ CNil. Com ::= "";       -- sin comando
 DInp. Cha ::= "INPUT";
 DOut. Cha ::= "OUTPUT";
 DFor. Cha ::= "FORDWARD";
+DPre. Cha ::= "PREROUTING";
+DPos. Cha ::= "POSTROUTING";
 
 -- Comparacion a realizar (el match que buscamos)
 MPro.    Mat ::= "-p" [Protocolo] [Pop];
@@ -57,8 +63,8 @@ MSrc.    Mat ::= "-s" Ip;
 MDst.    Mat ::= "-d" Ip;
 MInt.    Mat ::= "-i" String;
 MOut.    Mat ::= "-o" String;
-MFra.    Mat ::= "-f";
-MNFra.   Mat ::= "-f" "!";
+--MFra.    Mat ::= "-f";
+--MNFra.   Mat ::= "-f" "!";
 MState.  Mat ::= "-m" "--state" State;
 MMacS.   Mat ::= "-m" "mac" "--mac-sourse" String;
 MNMacS.  Mat ::= "-m" "mac" "--mac-sourse" "!" String;
@@ -78,7 +84,6 @@ IpU. Ip ::= Integer "." Integer "." Integer "." Integer;
 
 separator Pop "," ;
 -- separator TCPop "," ;
-separator Flags "," ;
 separator State "," ;
 separator Target "," ;
 
@@ -91,18 +96,14 @@ ODPortR.   Pop ::= "--dport" Integer ":" Integer;
 ONDPortR.  Pop ::= "--dport" "!" Integer ":" Integer;
 OSPortR.   Pop ::= "--sport" Integer ":" Integer;
 ONSPortR.  Pop ::= "--sport" "!" Integer ":" Integer;
-OTCPFlag.  Pop ::= "--tcp-flags" Flags;
-OTCPNFlag. Pop ::= "--tcp-flags" "!" Flags;
-OTCPNFlag. Pop ::= "--tcp-flags" "!" Flags;
-OICMPFlag. Pop ::= "--icmp-type" Flags;
-OICMPNFlag. Pop ::= "--icmp-type" "!" Flags;
+OTCPFlag.  Pop ::= "--tcp-flags" IntEstTCP;
+OTCPNFlag. Pop ::= "--tcp-flags" "!" IntEstTCP;
+OTCPNFlag. Pop ::= "--tcp-flags" "!" IntEstTCP;
+OICMPFlag. Pop ::= "--icmp-type" Integer;
+OICMPNFlag. Pop ::= "--icmp-type" "!" Integer;
 ONil.      Pop ::= "";
 
 -- Estado de la coneccion.
-FSYN. Flags ::= "SYN";
-FFIN. Flags ::= "FIN";
-FACK. Flags ::= "ACK";
-
 SNew. State ::= "NEW";
 SInv. State ::= "INVALID";
 SEst. State ::= "ESTABLISHED";

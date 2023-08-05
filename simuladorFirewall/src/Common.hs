@@ -6,7 +6,7 @@ import AbsSimFirewall
 
 type Mac = String
 
-data StatusPackege = ForCheck | Accept | Drop | Regect | Return
+data StatusPackege = ForCheck | Check | Nill | AcceptIn | AcceptSend | Drop | Regect | Return deriving Show 
 
 data Interfaz = Interfaz
     { nombre :: String
@@ -16,9 +16,11 @@ data Interfaz = Interfaz
     deriving Show
 
 data Chain = Chain
-    { input     :: [(Mat, Target)]
-    , output    :: [(Mat, Target)]
-    , fordware  :: [(Mat, Target)]
+    { input       :: [(Mat, Target)]
+    , output      :: [(Mat, Target)]
+    , fordware    :: [(Mat, Target)]
+    , prerouting  :: [(Mat, Target)]
+    , postrouting :: [(Mat, Target)]
     , politica  :: Target
     }
     deriving Show
@@ -34,5 +36,8 @@ data State = State
     { tablas    :: Table
     , packages  :: [(Package, StatusPackege)]
     , host      :: [Interfaz]
+    , connections :: [Connection]
     }
+    deriving Show
+
 -- data Options = Options { optPrint :: Bool, optAST   :: Bool , optEval  :: Int, optHelp  :: Bool} deriving Show

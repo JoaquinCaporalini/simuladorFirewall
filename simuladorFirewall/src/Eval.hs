@@ -1,6 +1,5 @@
 module Eval
   ( eval
-  , loadRules
   )
 where
 
@@ -8,124 +7,264 @@ import Data.List
 
 import AbsSimFirewall
 import Common
+import Lib
 
-initChain :: Chain
-initChain = Chain [] [] [] TgRegect
+{- Evaluar un estado -}
+eval :: Common.State -> Common.State
+eval s@(State t [] i c) = s
+eval s@(State t (p:ls) i c) =
+    let (State t' ls' i' c') = eval (State t ls i c)
+    in if isFromLocal p i
+       then State t' (fromLocal s : ls') i' c'-- Creado localmente
+       else State t' (fromOther s : ls') i' c'-- Recibido
 
-initState :: Common.State
-initState = State (Table initChain initChain initChain) [] []
+fromLocal = undefined
+fromOther = undefined
 
-loadFile :: Program -> Either Common.State String
-loadFile (Prog xs) = loadFile' xs $ Left initState
+-- Verifica que un paquete sea de creacion local
+isFromLocal :: (Package, StatusPackege) -> [Interfaz] -> Bool
+isFromLocal _ [] = False
+isFromLocal x@(p, _) (y:ys)
+    | ip y == f p = True
+    | otherwise = isFromLocal x ys
+    where f (Tcp _ i _ _ _ _ _ _ _) = i
+          f (Udp i _ _ _ _ _ _) = i
+          f (Icmp i _ _ _ _ _ _ _ _ _ _) = i
 
-loadFile' :: [Function] -> Either Common.State String -> Either Common.State String
-loadFile' [] s = s
-loadFile' _ e@(Right _) = e
-loadFile' ((Rules ls):xs) (Left s) =
-    case loadRules ls s of
-        (Right e) -> Right []
-        (Left s') -> loadFile' xs (Left s')
-loadFile' ((Host ls):xs) (Left s) =
-    case loadHost ls s of
-        (Right e) -> Right e
-        (Left s') -> loadFile' xs (Left s')
-loadFile' ((Packages ls):xs) (Left s) =
-    case loadPackages ls s of
-        (Right e) -> Right e
-        (Left s') -> loadFile' xs (Left s')
+-- Verifica que un paquete sea de creacion local
+isToLocal :: (Package, StatusPackege) -> [Interfaz] -> Bool
+isToLocal _ [] = False
+isToLocal x@(p, _) (y:ys)
+    | ip y == f p = True
+    | otherwise = isFromLocal x ys
+    where f (Tcp _ _ _ i _ _ _ _ _) = i
+          f (Udp _ _ i _ _ _ _) = i
+          f (Icmp _ _ i _ _ _ _ _ _ _ _) = i
 
-loadRules :: [Rule] -> Common.State -> Either Common.State String
-loadRules ((Rul TNat c m t):xs) s =
-    Left $ Common.State (Table (filterT tab) (addTabla c (m,t) (nat tab)) (mangle tab)) (packages s) (host s)
-    where tab = tablas s
-loadRules ((Rul TMan c m t):xs) s =
-    Left $ Common.State (Table (filterT tab) (nat tab) (addTabla c (m,t) (mangle tab))) (packages s) (host s)
-    where tab = tablas s
-loadRules ((Rul TFil c m t):xs) s =
-    Left $ Common.State (Table (addTabla c (m,t) (filterT tab)) (nat tab) (mangle tab)) (packages s) (host s)
-    where tab = tablas s
-loadRules [] s = Left s
+-- Primera etapa de un paquete entrante
+filtroManglePrerouting :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroManglePrerouting (p, st) s@(State t ps hs cs) =
+    case checkIn p (prerouting (mangle t)) (politica (mangle t)) hs cs of
+        Check -> filtroNatPrerouting (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
 
-addTabla :: Com -> (Mat, Target) -> Chain -> Chain
-addTabla CNil _ t = t
-addTabla (CApp a) r t =
-    addChain a t (\ x -> x ++ [r])
-addTabla (CDel a) r t =
-    addChain a t (delete r)
-addTabla (CRep a i) r t =
-    addChain a t (f i r)
-    where f 0 x (y:xs) = x : xs
-          f _ x [] = []
-          f n x (y:xs) = y : f (n - 1) x xs
-addTabla (CIns a i) r t =
-    addChain a t (f i r)
-    where f 0 x xs = x : xs
-          f _ x [] = [x]
-          f n x (y:xs) = y : f (n - 1) x xs
--- addTabla (CLis a) r t = t
-addTabla (CFlu a) r t =
-    addChain a t (const [])
--- addTabla (Czer a) r t = t
--- addTabla (CNew a) r t = t
--- addTabla (CDch a) r t = t
-addTabla (CPol a p) r t = Chain (input t) (output t) (fordware t) p
--- addTabla (CEna a) r t = t
+-- Segunda etapa de un paquete entrante
+filtroNatPrerouting :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroNatPrerouting (p, st) s@(State t ps hs cs) =
+    case checkIn p (prerouting (nat t)) (politica (nat t)) hs cs of
+        Check -> 
+            if isToLocal (p, ForCheck) hs
+            then filtroMangleInput (p, ForCheck) s
+            else filtroMangleFordware (p, ForCheck) s --id (p, Pass) t
+        st' -> (p, st')
+-- tercera etapa de un paquete entrante que debe de reenviarse
+filtroMangleFordware :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroMangleFordware (p, st) s@(State t ps hs cs) =
+    case checkIn p (fordware (mangle t)) (politica (mangle t)) hs cs of
+        Check -> filtroFilterForward (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
 
-addChain :: Cha -> Chain -> ([(Mat, Target)] -> [(Mat, Target)]) -> Chain
-addChain DInp c f = Chain (f (input c)) (output c) (fordware c) (politica c)
-addChain DOut c f = Chain (input c) (f (output c)) (fordware c) (politica c)
-addChain DFor c f = Chain (input c) (output c) (f (fordware c)) (politica c)
-
-loadHost :: [Inter] -> Common.State -> Either Common.State String
-loadHost [] s = Left s
-loadHost (x:xs) s =
-    case makeInterfase x of
-        (Right e) -> Right e
-        (Left i) -> loadHost xs $ State (tablas s) (packages s) (i : host s)
-
-makeInterfase :: Inter -> Either Interfaz String
-makeInterfase (Intrface s ip m) =
-    case f ip of
-        Left i -> if verificarMac m then Left $ Interfaz s m i else Right ("La Mac no es valida" ++ show m)
-        Right s' -> Right s'
-    where f i@(IpR n1 n2 n3 n4 r1) = if verificarIp n1 n2 n3 n4 r1
-                                     then Left i
-                                     else Right ("la Ip no es valida: " ++ show i)
-          f i@(IpU n1 n2 n3 n4) = if verificarIp n1 n2 n3 n4 0
-                                  then Left i
-                                  else Right ("la Ip no es valida: " ++ show i)
-
-verificarIp :: Integer -> Integer-> Integer -> Integer -> Integer -> Bool
-verificarIp n1 n2 n3 n4 r1  = 0 <= n1 && n1 < 256 && 0 <= n2 && n2 < 256 && 0 <= n3 && n3 < 256 && 0 <= n4 && n4 < 256 && 0 <= r1 && r1 < 32
-verificarIp' (IpR n1 n2 n3 n4 r1) = verificarIp n1 n2 n3 n4 r1
-verificarIp' (IpU n1 n2 n3 n4) = verificarIp n1 n2 n3 n4 0
+-- Cuarta etapa de un paquete entrante que debe de reenviarse
+filtroFilterForward :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroFilterForward (p, st) s@(State t ps hs cs) =
+    case checkIn p (fordware (filterT t)) (politica (filterT t)) hs cs of
+        Check -> filtroManglePostrouting (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
 
 
-verificarMac :: [Char] -> Bool
-verificarMac [] = True
-verificarMac (m1:m2:m3:ms) = elem m1 ls && elem m2 ls && m3 == ':' && verificarMac ms
-    where ls = "0123456789ABCDFE"
-verificarMac (m1:m2:ms) = elem m1 ls && elem m2 ls && verificarMac ms
-    where ls = "0123456789ABCDFE"
-verificarMac _ = False
+-- Quinta etapa de un paquete entrante que debe de reenviarse
+-- Cuarta etapa de un paquete local que debe enviarse
+filtroManglePostrouting :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroManglePostrouting (p, st) s@(State t ps hs cs) =
+    case checkIn p (postrouting (mangle t)) (politica (mangle t)) hs cs of
+        Check -> filtroNatPostrouting (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
 
-loadPackages :: [Package] -> Common.State -> Either Common.State String
-loadPackages [] s = Left s
-loadPackages (p@(Tcp e sip smac dip sport dport ttl u):xs) s
-    | not (verificarIp' sip) = Right ("La ip de origen no es valida" ++ show sip)
-    | not (verificarIp' dip) = Right ("La ip de origen no es valida" ++ show sip)
-    | not (verificarMac smac) = Right ("La Mac no es valida" ++ smac) 
-    | otherwise = loadPackages xs $ State (tablas s) ((p, ForCheck)  : packages s) (host s)
-loadPackages (p@(Udp sip smac dip sport dport u):xs) s
-    | not (verificarIp' sip) = Right ("La ip de origen no es valida" ++ show sip)
-    | not (verificarIp' dip) = Right ("La ip de origen no es valida" ++ show sip)
-    | not (verificarMac smac) = Right ("La Mac no es valida" ++ smac) 
-    | otherwise = loadPackages xs $ State (tablas s) ((p, ForCheck)  : packages s) (host s)
-loadPackages (p@(Icmp sip smac dip st sc sid dt dc did u):xs) s
-    | not (verificarIp' sip) = Right ("La ip de origen no es valida" ++ show sip)
-    | not (verificarIp' dip) = Right ("La ip de origen no es valida" ++ show sip)
-    | not (verificarMac smac) = Right ("La Mac no es valida" ++ smac) 
-    | otherwise = loadPackages xs $ State (tablas s) ((p, ForCheck)  : packages s) (host s)
+-- Sexta etapa de un paquete entrante para este host
+-- Quinta etapa de un paquete local que debe enviarse
+filtroNatPostrouting :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroNatPostrouting (p, st) s@(State t ps hs cs) =
+    case checkIn p (postrouting (nat t)) (politica (nat t)) hs cs of
+        Check -> (p, AcceptSend)--id (p, Pass) t
+        st' -> (p, st')
 
-eval = id
+-- Tercera etapa de un paquete entrante que va al host
+filtroMangleInput :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroMangleInput (p, st) s@(State t ps hs cs) =
+    case checkIn p (input (mangle t)) (politica (mangle t)) hs cs of
+        Check -> filtroFilterInput (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
 
+-- Cuarta etapa de un paquete entrante que va al host
+filtroFilterInput :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroFilterInput (p, st) s@(State t ps hs cs) =
+    case checkIn p (input (filterT t)) (politica (filterT t)) hs cs of
+        Check -> (p, AcceptIn)--id (p, Pass) t
+        st' -> (p, st')
+
+-- Primera etapa de un paquete local que debe enviarse
+filtroMangleOutput :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroMangleOutput (p, st) s@(State t ps hs cs) =
+    case checkIn p (output (mangle t)) (politica (mangle t)) hs cs of
+        Check -> filtroNatOutput (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
+
+-- Segunda etapa de un paquete local que debe enviarse
+filtroNatOutput :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroNatOutput (p, st) s@(State t ps hs cs) =
+    case checkIn p (output (nat t)) (politica (nat t)) hs cs of
+        Check -> filtroFilterOutput (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
+
+-- Trersera etapa de un paquete local que debe enviarse
+filtroFilterOutput :: (Package, StatusPackege) -> Common.State -> (Package, StatusPackege)
+filtroFilterOutput (p, st) s@(State t ps hs cs) =
+    case checkIn p (output (nat t)) (politica (nat t)) hs cs of
+        Check -> filtroManglePostrouting (p, ForCheck) s--id (p, Pass) t
+        st' -> (p, st')
+
+-- 
+-- 
+-- 
+
+-- checkIn: Verifica si verifica alguna de las regla y aplica la accion correspondiente.
+checkIn :: Package -> [(Mat, Target)] -> Target -> [Interfaz] -> [Connection] -> StatusPackege
+checkIn _ [] t hs cs = targetToStatusPackege t
+checkIn p (x:xs) t hs cs =
+    case aplicaRegla p x t hs cs of
+        ForCheck -> checkIn p xs t hs cs
+        e -> e
+-- aplicaRegla: Verifica si cumple una regla espesifica y aplica su accion
+aplicaRegla :: Package -> (Mat, Target) -> Target -> [Interfaz] -> [Connection] -> StatusPackege
+aplicaRegla p (MPro ps xs, t) def hs cs =
+    if f p ps
+    then case checkOp p xs t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+    where f _ [] = False
+          f (Tcp _ _ _ _ _ _ _ _ _) (PTcp:xs) = True
+          f (Udp _ _ _ _ _ _ _) (PUdp:xs) = True
+          f (Icmp _ _ _ _ _ _ _ _ _ _ _) (PIcmp:xs) = True
+          f _ (PAll:xs) = True
+          f p (x:xs) = f p xs
+aplicaRegla p (MNPro ps xs, t) def hs cs =
+    if not (f p ps)
+    then case checkOp p xs t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+    where f _ [] = False
+          f Tcp {} (PTcp:xs) = True
+          f Udp {} (PUdp:xs) = True
+          f Icmp {} (PIcmp:xs) = True
+          f _ (PAll:xs) = True
+          f p (x:xs) = f p xs
+aplicaRegla p (MSrc i, t) def hs cs = 
+    if sourceIp p == i
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+aplicaRegla p (MDst i, t) def hs cs = 
+    if destIp p == i
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+aplicaRegla p (MInt s, t) def hs cs =
+    if packageInterface p == s
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+aplicaRegla p (MOut s, t) def hs cs = 
+    if packageInterface p == s
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+aplicaRegla p (MState s, t) def hs cs = 
+    if f cs
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+    where f [] = False
+          f ((C ip1 p1 ip2 p2 e):cs) =
+            case (srcPort, dstPort) of
+                (Just a, Just b) -> 
+                    if (ip1 == srcIp && p1 == a && ip2 == dstIp && p2 == b) || (ip2 == srcIp && p2 == a && ip1 == dstIp && p1 == b)
+                    then e == s
+                    else f cs
+                e -> False
+          srcIp = sourceIp p
+          dstIp = destIp p
+          srcPort = sourcePort p
+          dstPort = destPort p
+aplicaRegla p (MMacS s, t) def hs cs = 
+    if sourceMac p == s
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+aplicaRegla p (MNMacS s, t) def hs cs = 
+    if sourceMac p /= s
+    then case targetToStatusPackege t of
+        Nill  -> targetToStatusPackege def
+        e     -> e
+    else ForCheck
+aplicaRegla p (MNil, t) def hs cs = targetToStatusPackege def
+
+-- Verifica si se puede aplicar una operacion sobre paquetes
+checkOp :: Package -> [Pop] -> Target -> StatusPackege
+checkOp _ [] t = ForCheck
+checkOp p xs t = 
+    if foldl (&&) True (map (checkOp' p) xs)
+    then targetToStatusPackege t
+    else ForCheck 
+
+checkOp' :: Package -> Pop -> Bool
+checkOp' p (ODPortS n) =
+    case destPort p of
+        Just port -> port == n
+        Nothing -> False
+checkOp' p (ONDPortS n) =
+    case destPort p of
+        Just port -> port /= n
+        Nothing -> False
+checkOp' p (OSPortS n) =
+    case sourcePort p of
+        Just port -> port == n
+        Nothing -> False
+checkOp' p (ONSPortS n) =
+    case sourcePort p of
+        Just port -> port /= n
+        Nothing -> False
+checkOp' p (ODPortR n m) =
+    case destPort p of
+        Just port -> n<= port
+        Nothing -> False
+checkOp' p (ONDPortR n m) =
+    case destPort p of
+        Just port -> m > port && port < n
+        Nothing -> False
+checkOp' p (OSPortR n m)=
+    case sourcePort p of
+        Just port -> n<= port && port <= n 
+        Nothing -> False
+checkOp' p (ONSPortR n m)=
+    case sourcePort p of
+        Just port -> m > port && port < n
+        Nothing -> False
+checkOp' (Tcp s _ _ _ _ _ _ _ _) (OTCPFlag f) = f == s
+checkOp' p (OTCPFlag _) = False
+checkOp' (Tcp f _ _ _ _ _ _ _ _) (OTCPNFlag s) = f /= s
+checkOp' p (OTCPNFlag _) = False
+checkOp' (Icmp _ _ _ s _ _ _ _ _ _ _) (OICMPFlag f) = f == s
+checkOp' p (OICMPFlag f) = False
+checkOp' (Icmp _ _ _ s _ _ _ _ _ _ _) (OICMPNFlag f) = f /= s
+checkOp' p (OICMPNFlag f) = False
+checkOp' p ONil = False
+
+-- f ip x = ip + (2 ^ (8 - x) - 1)

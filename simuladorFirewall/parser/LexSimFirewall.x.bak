@@ -21,7 +21,7 @@ $i = [$l $d _ ']     -- identifier character
 $u = [. \n]          -- universal: any character
 
 @rsyms =    -- symbols and non-identifier-like reserved words
-   \; | \- "t" | \- "A" | \- "D" | \- "R" | \- "I" | \- "F" | \- "P" | \- "p" | \! | \- "s" | \- "d" | \- "i" | \- "o" | \- "f" | \- "m" | \- \- "state" | \- \- "mac" \- "sourse" | \, | \. | \/ | \- \- "dport" | \- \- "sport" | \: | \- \- "tcp" \- "flags" | \- \- "icmp" \- "type" | \- "j"
+   \; | "src" \- "mac" | \- "t" | \- "A" | \- "D" | \- "R" | \- "I" | \- "F" | \- "P" | \- "p" | \! | \- "s" | \- "d" | \- "i" | \- "o" | \- "m" | \- \- "state" | \- \- "mac" \- "sourse" | \, | \. | \/ | \- \- "dport" | \- \- "sport" | \: | \- \- "tcp" \- "flags" | \- \- "icmp" \- "type" | \- "j"
 
 :-
 "#" [.]* ; -- Toss single line comments
@@ -105,7 +105,7 @@ eitherResIdent tv s = treeFind resWords
                               | s == a = t
 
 resWords :: BTree
-resWords = b "ACK" 29 (b "-d" 15 (b "--tcp-flags" 8 (b "--icmp-type" 4 (b "," 2 (b "!" 1 N N) (b "--dport" 3 N N)) (b "--sport" 6 (b "--mac-sourse" 5 N N) (b "--state" 7 N N))) (b "-I" 12 (b "-D" 10 (b "-A" 9 N N) (b "-F" 11 N N)) (b "-R" 14 (b "-P" 13 N N) N))) (b "-s" 22 (b "-m" 19 (b "-i" 17 (b "-f" 16 N N) (b "-j" 18 N N)) (b "-p" 21 (b "-o" 20 N N) N)) (b ":" 26 (b "." 24 (b "-t" 23 N N) (b "/" 25 N N)) (b "ACCEPT" 28 (b ";" 27 N N) N)))) (b "REGECT" 44 (b "INIT_HOST" 37 (b "END_RULES" 33 (b "END_HOST" 31 (b "DROP" 30 N N) (b "END_PACKAGES" 32 N N)) (b "FIN" 35 (b "ESTABLISHED" 34 N N) (b "FORDWARD" 36 N N))) (b "INVALID" 41 (b "INIT_RULES" 39 (b "INIT_PACKAGES" 38 N N) (b "INPUT" 40 N N)) (b "OUTPUT" 43 (b "NEW" 42 N N) N))) (b "interfaz" 51 (b "all" 48 (b "RETURN" 46 (b "RELATED" 45 N N) (b "SYN" 47 N N)) (b "icmp" 50 (b "filter" 49 N N) N)) (b "nat" 55 (b "mac" 53 (b "ip" 52 N N) (b "mangle" 54 N N)) (b "udp" 57 (b "tcp" 56 N N) N))))
+resWords = b "INPUT" 41 (b "-s" 21 (b "-F" 11 (b "--sport" 6 (b "--dport" 3 (b "," 2 (b "!" 1 N N) N) (b "--mac-sourse" 5 (b "--icmp-type" 4 N N) N)) (b "-A" 9 (b "--tcp-flags" 8 (b "--state" 7 N N) N) (b "-D" 10 N N))) (b "-i" 16 (b "-R" 14 (b "-P" 13 (b "-I" 12 N N) N) (b "-d" 15 N N)) (b "-o" 19 (b "-m" 18 (b "-j" 17 N N) N) (b "-p" 20 N N)))) (b "END_HOST" 31 (b ";" 26 (b "/" 24 (b "." 23 (b "-t" 22 N N) N) (b ":" 25 N N)) (b "CLOSE_WAIT" 29 (b "CLOSE" 28 (b "ACCEPT" 27 N N) N) (b "DROP" 30 N N))) (b "FORDWARD" 36 (b "ESTABLISHED" 34 (b "END_RULES" 33 (b "END_PACKAGES" 32 N N) N) (b "FIN_WAIT" 35 N N)) (b "INIT_PACKAGES" 39 (b "INIT_HOST" 38 (b "ICMP" 37 N N) N) (b "INIT_RULES" 40 N N))))) (b "dport" 62 (b "RETURN" 52 (b "OUTPUT" 47 (b "LISTEN" 44 (b "LAST_ACK" 43 (b "INVALID" 42 N N) N) (b "NONE" 46 (b "NEW" 45 N N) N)) (b "REGECT" 50 (b "PREROUTING" 49 (b "POSTROUTING" 48 N N) N) (b "RELATED" 51 N N))) (b "UDP" 57 (b "TCP" 55 (b "SYN_SENT" 54 (b "SYN_RECV" 53 N N) N) (b "TIME_WAIT" 56 N N)) (b "dcode" 60 (b "all" 59 (b "Use" 58 N N) N) (b "did" 61 N N)))) (b "scode" 72 (b "interfaz" 67 (b "filter" 65 (b "dtype" 64 (b "dst" 63 N N) N) (b "icmp" 66 N N)) (b "mangle" 70 (b "mac" 69 (b "ip" 68 N N) N) (b "nat" 71 N N))) (b "state" 77 (b "src" 75 (b "spot" 74 (b "sid" 73 N N) N) (b "src-mac" 76 N N)) (b "ttl" 80 (b "tcp" 79 (b "stype" 78 N N) N) (b "udp" 81 N N)))))
    where b s n = let bs = id s
                   in B bs (TS bs n)
 

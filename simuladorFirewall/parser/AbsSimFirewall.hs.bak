@@ -6,7 +6,14 @@ module AbsSimFirewall where
 data Program = Prog [Function]
   deriving (Eq, Ord, Show, Read)
 
-data Function = Rules [Rule] | Host [Inter] | Packages [PInfo]
+data Function
+    = Rules [Rule]
+    | Host [Inter]
+    | Packages [Package]
+    | Connections [Connection]
+  deriving (Eq, Ord, Show, Read)
+
+data Connection = C Ip Integer Ip Integer State
   deriving (Eq, Ord, Show, Read)
 
 data Rule = Rul Tab Com Mat Target
@@ -15,10 +22,10 @@ data Rule = Rul Tab Com Mat Target
 data Inter = Intrface String Ip String
   deriving (Eq, Ord, Show, Read)
 
-data PInfo
-    = PInfoTcp IntEstTCP Ip String Ip Integer Integer Integer Integer
-    | PInfoUdp Ip String Ip Integer Integer Integer
-    | PInfoIcmp Ip String Ip Integer Integer Integer Integer Integer Integer Integer
+data Package
+    = Tcp IntEstTCP Ip String Ip Integer Integer Integer Integer String
+    | Udp Ip String Ip Integer Integer Integer String
+    | Icmp Ip String Ip Integer Integer Integer Integer Integer Integer Integer String
   deriving (Eq, Ord, Show, Read)
 
 data Tab = TNat | TMan | TFil
@@ -34,7 +41,7 @@ data Com
     | CNil
   deriving (Eq, Ord, Show, Read)
 
-data Cha = DInp | DOut | DFor
+data Cha = DInp | DOut | DFor | DPre | DPos
   deriving (Eq, Ord, Show, Read)
 
 data Mat
@@ -44,11 +51,9 @@ data Mat
     | MDst Ip
     | MInt String
     | MOut String
-    | MFra
-    | MNFra
     | MState State
-    | MMacS
-    | MNMacS
+    | MMacS String
+    | MNMacS String
     | MNil
   deriving (Eq, Ord, Show, Read)
 
@@ -69,14 +74,11 @@ data Pop
     | ONDPortR Integer Integer
     | OSPortR Integer Integer
     | ONSPortR Integer Integer
-    | OTCPFlag Flags
-    | OTCPNFlag Flags
-    | OICMPFlag Flags
-    | OICMPNFlag Flags
+    | OTCPFlag IntEstTCP
+    | OTCPNFlag IntEstTCP
+    | OICMPFlag IntEstTCP
+    | OICMPNFlag IntEstTCP
     | ONil
-  deriving (Eq, Ord, Show, Read)
-
-data Flags = FSYN | FFIN | FACK
   deriving (Eq, Ord, Show, Read)
 
 data State = SNew | SInv | SEst | SRel
