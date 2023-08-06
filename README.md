@@ -95,7 +95,7 @@ existen unas cuantas combinaciones posibles de estas, a continuación se muestra
 -t filter -A OUTPUT -s 192.168.100.7 -j ACCEPT;
 -t nat -A OUTPUT -p tcp -j ACCEPT;
 -t nat -A POSTROUTING -i "ens33" -j ACCEPT;
--t mangle -I FORDWARD 0 -m –state NEW -j REGECT;
+-t mangle -I FORDWARD 0 -m –state NEW -j REJECT;
 ```
 
 ## Modo de uso
@@ -119,17 +119,26 @@ Y por último para ejecutarlo (sin instalar)
 stack exec simuladorFirewall-exe FILE
 ```
 
+## Recorrido de los paquetes ips por las tablas y cadenas
 
-
-
-
+Un paquete, según si es entrante dirigido a nuestro host o debe de ser enviado o reenviado, recorre las tablas y sus subcadenas en un orden particular en el cual fuera de este simulador, en la vida real dentro del kernel de linux, se realizan otro tipo de transformaciones aunque en nuestro caso solo se le aplicarán determinadas reglas que le permiten continuar o lo rechazan.
 
 ```mermaid
 graph TD;
-    LLegada de un paquete por la interfaz--> Mangle Prerouting;
-    Mangle Prerouting --> Nat Prerouting;
-    Nat Prerouting --> Mangle Input;
-    Mangle Input --> Filter Input;
-    Filter Input --> Pasa el filtro y llega al host;
-    C-->D;
+    LLegadaPaquete--> ManglePrerouting;
+    ManglePrerouting --> NatPrerouting;
+    NatPrerouting --> MangleInput;
+    MangleInput --> FilterInput;
+    FilterInput --> LlegaAlHost;
+    NatPrerouting --> MangleForware;
+    MangleForware --> FilterForward;
+    FilterForward --> ManglePostrouting;
+    ManglePostrouting --> NatPostrouting;
+    GeneraPaqueteLocal --> MangleOutput;
+    MangleOutput --> NatOutput;
+    NatOutput --> FilterOutput;
+    FilterOutput --> ManglePostrouting;
+    NatPostrouting --> EsEnviado;
 ```
+
+Un paqute para ser enviado a la red por alguna de las interfaces o ser entregado al host debe se sortear todas estas capas en el orden que corresponda según cada caso.
