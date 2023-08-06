@@ -89,6 +89,7 @@ Las reglas son la parte más jugosa a la hora de construir un filtro de paquetes
 existen unas cuantas combinaciones posibles de estas, a continuación se muestran algunas   
 
 ```
+INIT_RULES
 -t mangle -P -j ACCEPT;
 -t nat -P -j RETURN;
 -t filter -P -j DROP;
@@ -96,6 +97,7 @@ existen unas cuantas combinaciones posibles de estas, a continuación se muestra
 -t nat -A OUTPUT -p tcp -j ACCEPT;
 -t nat -A POSTROUTING -i "ens33" -j ACCEPT;
 -t mangle -I FORDWARD 0 -m –state NEW -j REJECT;
+END_RULES
 ```
 
 ## Modo de uso
@@ -117,6 +119,35 @@ Y por último para ejecutarlo (sin instalar)
 
 ```
 stack exec simuladorFirewall-exe FILE
+```
+
+Por ejemplo si ejecutamos el archivo provisto para pruebas obtenemos:
+```BASH
+usr@lab:~/simuladorFirewall$ stack exec simuladorFirewall-exe test/test.example
+test/test.example
+
+Parse Successful!
+
+--> Paquete: 0 Estado: Return
+UDP   interfaz de entrada "wifi0"
+    src=192.168.135.4 dst=192.168.100.7 sport=8080 dport=5
+    srcMac: 00:15:17:a2:07:56 use: 5
+--> Paquete: 1 Estado: Return
+Icmp   interfaz de entrada "ens33"
+    src=200.3.123.114 dst=192.168.100.7
+    srcMac: ca:fe:29:f7:00:ae use: 0 stype=129 dtype=0 sid=2 did=2 sc=1 dc=1
+--> Paquete: 2 Estado: Return
+Icmp   interfaz de entrada "ens33"
+    src=192.168.100.7 dst=200.3.123.114
+    srcMac: 00:0c:29:f7:5c:ae use: 0 stype=128 dtype=129 sid=2 did=2 sc=1 dc=1
+--> Paquete: 3 Estado: Drop
+TCP  Established interfaz de entrada eth0
+    src=192.168.135.4 dst=192.168.100.7 sport=8080 dport=5
+    srcMac: 00:15:17:a2:07:56 ttl: 55 use: 1
+--> Paquete: 4 Estado: Return
+TCP  Established interfaz de entrada wifi0
+    src=192.168.100.7 dst=192.168.100.7 sport=8080 dport=5
+    srcMac: 00:0c:29:f7:5c:ae ttl: 55 use: 1
 ```
 
 ## Recorrido de los paquetes ips por las tablas y cadenas
