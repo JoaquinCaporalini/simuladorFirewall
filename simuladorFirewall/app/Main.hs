@@ -75,7 +75,7 @@ main = do
   args <- getArgs
   case args of
     ["--help"] -> usage
-    [] -> getContents >>= run 2 pProgram
+    [] -> exitFailure
     "-s":fs -> mapM_ (runFile 0 pProgram) fs
     fs -> mapM_ (runFile 2 pProgram) fs
 
