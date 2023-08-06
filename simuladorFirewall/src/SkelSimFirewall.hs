@@ -100,7 +100,7 @@ transTarget :: Target -> Result
 transTarget x = case x of
   TgAccept -> failure x
   TgDrop -> failure x
-  TgRegect -> failure x
+  TgReject -> failure x
   TgReturn -> failure x
   TgNill -> failure x
 transIntEstTCP :: IntEstTCP -> Result

@@ -32,7 +32,7 @@ The reserved words used in SimFirewall are the following:
   | ``INIT_CONNECTIONS`` | ``INIT_HOST`` | ``INIT_PACKAGES`` | ``INIT_RULES``
   | ``INPUT`` | ``INVALID`` | ``LAST_ACK`` | ``LISTEN``
   | ``NEW`` | ``NONE`` | ``OUTPUT`` | ``POSTROUTING``
-  | ``PREROUTING`` | ``REGECT`` | ``RELATED`` | ``RETURN``
+  | ``PREROUTING`` | ``REJECT`` | ``RELATED`` | ``RETURN``
   | ``SYN_RECV`` | ``SYN_SENT`` | ``TCP`` | ``TIME_WAIT``
   | ``UDP`` | ``Use`` | ``all`` | ``dcode``
   | ``did`` | ``dport`` | ``dst`` | ``dtype``
@@ -151,7 +151,7 @@ All other symbols are terminals.
   |  |  **|**  | ``RELATED``
   | //Target// | -> | ``-j`` ``ACCEPT``
   |  |  **|**  | ``-j`` ``DROP``
-  |  |  **|**  | ``-j`` ``REGECT``
+  |  |  **|**  | ``-j`` ``REJECT``
   |  |  **|**  | ``-j`` ``RETURN``
   |  |  **|**  | **eps**
   | //[IntEstTCP]// | -> | **eps**

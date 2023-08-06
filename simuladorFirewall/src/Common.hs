@@ -6,7 +6,7 @@ import AbsSimFirewall
 
 type Mac = String
 
-data StatusPackege = ForCheck | Check | Nill | AcceptIn | AcceptSend | Drop | Regect | Return deriving Show 
+data StatusPackege = ForCheck | Check | Nill | AcceptIn | AcceptSend | Drop | Reject | Return deriving Show 
 
 data Interfaz = Interfaz
     { nombre :: String

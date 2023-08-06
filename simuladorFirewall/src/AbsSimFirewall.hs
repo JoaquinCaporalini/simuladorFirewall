@@ -86,7 +86,7 @@ data Pop
 data State = SNew | SInv | SEst | SRel
   deriving (Eq, Ord, Show, Read)
 
-data Target = TgAccept | TgDrop | TgRegect | TgReturn | TgNill
+data Target = TgAccept | TgDrop | TgReject | TgReturn | TgNill
   deriving (Eq, Ord, Show, Read)
 
 data IntEstTCP

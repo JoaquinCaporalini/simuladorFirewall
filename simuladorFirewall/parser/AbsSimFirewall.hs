@@ -26,7 +26,7 @@ data Package
     = Tcp IntEstTCP Ip String Ip Integer Integer Integer Integer String
     | Udp Ip String Ip Integer Integer Integer String
     | Icmp Ip String Ip Integer Integer Integer Integer Integer Integer Integer String
-  deriving (Eq, Ord, Read)
+  deriving (Eq, Ord, Show, Read)
 
 data Tab = TNat | TMan | TFil
   deriving (Eq, Ord, Show, Read)
@@ -84,7 +84,7 @@ data Pop
 data State = SNew | SInv | SEst | SRel
   deriving (Eq, Ord, Show, Read)
 
-data Target = TgAccept | TgDrop | TgRegect | TgReturn | TgNill
+data Target = TgAccept | TgDrop | TgReject | TgReturn | TgNill
   deriving (Eq, Ord, Show, Read)
 
 data IntEstTCP
@@ -99,20 +99,4 @@ data IntEstTCP
     | LastAck
     | Listen
   deriving (Eq, Ord, Show, Read)
-
-instance Show Package where
-  show (Tcp e src mac dst sport dport ttl us int) =
-    "TCP  " ++ show e ++ " interfaz de entrada " ++ int ++
-    "\n    src=" ++ show src ++ " dst=" ++ show dst ++ " sport=" ++ show sport ++ " dport=" ++ show dport ++
-    "\n    srcMac: " ++ mac ++ " ttl: " ++ show ttl ++ " use: " ++ show us
-  show (Udp src mac dst sport dport us int) =
-    "UDP  " ++ " interfaz de entrada " ++ show int ++
-    "\n    src=" ++ show src ++ " dst=" ++ show dst ++ " sport=" ++ show sport ++ " dport=" ++ show dport ++
-    "\n    srcMac: " ++ mac ++ " use: " ++ show us
-  show (Icmp src mac dst st sc sid dt dc did us int ) =
-    "Icmp  " ++ " interfaz de entrada " ++ show int ++
-    "\n    src=" ++ show src ++ " dst=" ++ show dst ++
-    "\n    srcMac: " ++ mac ++ " use: " ++ show us ++ " stype=" ++ show st ++ " dtype=" ++ 
-    show dt ++ " sid=" ++ show sid ++ " did=" ++ show did ++ " sc=" ++ show sc ++ " dc=" ++ show dc
-
 

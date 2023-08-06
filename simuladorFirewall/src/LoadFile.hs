@@ -11,7 +11,7 @@ import Lib
 
 {- Creacion del estado inicial -}
 initChain :: Chain
-initChain = Chain [] [] [] [] [] TgRegect
+initChain = Chain [] [] [] [] [] TgReject
 
 initState :: Common.State
 initState = State (Table initChain initChain initChain) [] [] []

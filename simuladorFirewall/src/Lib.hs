@@ -59,7 +59,7 @@ sourceMac (Icmp _ a _ _ _ _ _ _ _ _ _)  = a
 targetToStatusPackege :: Target -> StatusPackege
 targetToStatusPackege TgAccept = Check
 targetToStatusPackege TgDrop   = Drop
-targetToStatusPackege TgRegect = Regect
+targetToStatusPackege TgReject = Reject
 targetToStatusPackege TgReturn = Return
 targetToStatusPackege TgNill   = Nill
 

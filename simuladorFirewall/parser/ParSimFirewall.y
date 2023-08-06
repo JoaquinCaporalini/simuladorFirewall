@@ -92,7 +92,7 @@ import ErrM
   'OUTPUT' { PT _ (TS _ 49) }
   'POSTROUTING' { PT _ (TS _ 50) }
   'PREROUTING' { PT _ (TS _ 51) }
-  'REGECT' { PT _ (TS _ 52) }
+  'REJECT' { PT _ (TS _ 52) }
   'RELATED' { PT _ (TS _ 53) }
   'RETURN' { PT _ (TS _ 54) }
   'SYN_RECV' { PT _ (TS _ 55) }
@@ -249,7 +249,7 @@ State : 'NEW' { AbsSimFirewall.SNew }
 Target :: { Target }
 Target : '-j' 'ACCEPT' { AbsSimFirewall.TgAccept }
        | '-j' 'DROP' { AbsSimFirewall.TgDrop }
-       | '-j' 'REGECT' { AbsSimFirewall.TgRegect }
+       | '-j' 'REJECT' { AbsSimFirewall.TgReject }
        | '-j' 'RETURN' { AbsSimFirewall.TgReturn }
        | {- empty -} { AbsSimFirewall.TgNill }
 ListIntEstTCP :: { [IntEstTCP] }

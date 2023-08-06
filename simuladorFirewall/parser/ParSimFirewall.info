@@ -144,7 +144,7 @@ Grammar
 	State -> 'RELATED'                                 (119)
 	Target -> '-j' 'ACCEPT'                            (120)
 	Target -> '-j' 'DROP'                              (121)
-	Target -> '-j' 'REGECT'                            (122)
+	Target -> '-j' 'REJECT'                            (122)
 	Target -> '-j' 'RETURN'                            (123)
 	Target ->                                          (124)
 	ListIntEstTCP ->                                   (125)
@@ -214,7 +214,7 @@ Terminals
 	'OUTPUT'       { PT _ (TS _ 49) }
 	'POSTROUTING'  { PT _ (TS _ 50) }
 	'PREROUTING'   { PT _ (TS _ 51) }
-	'REGECT'       { PT _ (TS _ 52) }
+	'REJECT'       { PT _ (TS _ 52) }
 	'RELATED'      { PT _ (TS _ 53) }
 	'RETURN'       { PT _ (TS _ 54) }
 	'SYN_RECV'     { PT _ (TS _ 55) }
@@ -1007,12 +1007,12 @@ State 44
 
 	Target -> '-j' . 'ACCEPT'                           (rule 120)
 	Target -> '-j' . 'DROP'                             (rule 121)
-	Target -> '-j' . 'REGECT'                           (rule 122)
+	Target -> '-j' . 'REJECT'                           (rule 122)
 	Target -> '-j' . 'RETURN'                           (rule 123)
 
 	'ACCEPT'       shift, and enter state 166
 	'DROP'         shift, and enter state 167
-	'REGECT'       shift, and enter state 168
+	'REJECT'       shift, and enter state 168
 	'RETURN'       shift, and enter state 169
 
 
@@ -2748,7 +2748,7 @@ State 167
 
 State 168
 
-	Target -> '-j' 'REGECT' .                           (rule 122)
+	Target -> '-j' 'REJECT' .                           (rule 122)
 
 	','            reduce using rule 122
 	'-A'           reduce using rule 122

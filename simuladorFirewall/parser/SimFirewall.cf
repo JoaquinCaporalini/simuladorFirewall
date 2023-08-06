@@ -111,7 +111,7 @@ SRel. State ::= "RELATED";
 
 TgAccept. Target ::= "-j" "ACCEPT";
 TgDrop.   Target ::= "-j" "DROP"; 
-TgRegect. Target ::= "-j" "REGECT";
+TgReject. Target ::= "-j" "REJECT";
 TgReturn. Target ::= "-j" "RETURN";
 TgNill.   Target ::= "";
 

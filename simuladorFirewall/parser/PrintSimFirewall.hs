@@ -254,7 +254,7 @@ instance Print AbsSimFirewall.Target where
   prt i e = case e of
     AbsSimFirewall.TgAccept -> prPrec i 0 (concatD [doc (showString "-j"), doc (showString "ACCEPT")])
     AbsSimFirewall.TgDrop -> prPrec i 0 (concatD [doc (showString "-j"), doc (showString "DROP")])
-    AbsSimFirewall.TgRegect -> prPrec i 0 (concatD [doc (showString "-j"), doc (showString "REGECT")])
+    AbsSimFirewall.TgReject -> prPrec i 0 (concatD [doc (showString "-j"), doc (showString "REJECT")])
     AbsSimFirewall.TgReturn -> prPrec i 0 (concatD [doc (showString "-j"), doc (showString "RETURN")])
     AbsSimFirewall.TgNill -> prPrec i 0 (concatD [])
   prtList _ [] = concatD []
