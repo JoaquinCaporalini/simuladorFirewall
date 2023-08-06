@@ -1,0 +1,28 @@
+INIT_HOST
+interfaz "eth0" ip 192.168.135.4 mac "00:15:17:a2:07:56";
+interfaz "eth1" ip 200.3.123.115 mac "00:15:17:a2:07:56";
+interfaz "eth2" ip 192.168.1.100 mac "00:0c:29:f7:5c:ae";
+interfaz "wifi0" ip 172.16.0.7 mac "10:0c:ca:fe:5c:21";
+END_HOST
+INIT_PACKAGES
+TCP state ESTABLISHED src 192.168.100.7 src-mac "00:0c:29:f7:5c:ae" dst 192.168.100.7 spot 8080 dport 5 ttl 55 Use 1 interfaz "wifi0"  ;
+TCP state ESTABLISHED src 192.168.135.4 src-mac "00:15:17:a2:07:56" dst 192.168.100.7 spot 8080 dport 5 ttl 55 Use 1 interfaz "eth0"  ;
+ICMP src 192.168.100.7 src-mac "00:0c:29:f7:5c:ae" dst 200.3.123.114 stype 128 scode 1 sid 2 dtype 129 dcode 1 did 2 Use 0 interfaz "ens33";
+ICMP src 200.3.123.114 src-mac "ca:fe:29:f7:00:ae" dst 192.168.100.7 stype 129 scode 1 sid 2 dtype 0 dcode 1 did 2 Use 0 interfaz "ens33";
+UDP src 192.168.135.4 src-mac  "00:15:17:a2:07:56" dst 192.168.100.7 spot 8080 dport 5 Use 5 interfaz "wifi0" ;
+# TCP state ESTABLISHED src 192.168.135.4 src-mac  "00:15:17:a2:07:56" dst 192.168.100.7 spot 8080 dport 5 ttl 55 Use 1 interfaz "eth0"  ;
+# ICMP src 192.168.100.7 src-mac "00:0c:29:f7:5c:ae" dst 200.3.123.114 stype 128 scode 1 sid 2 dtype 129 dcode 1 did 2 Use 0 interfaz "ens33";
+END_PACKAGES
+INIT_CONNECTIONS
+ip 200.3.123.115 puerto 8080 ip 192.168.100.11 puerto 5 state NEW;
+ip 192.168.100.7 puerto 80 ip 200.3.123.115 puerto 5 state ESTABLISHED;
+END_CONNECTIONS
+INIT_RULES
+-t mangle -P -j ACCEPT;
+-t nat -P -j RETURN;
+-t filter -P -j DROP;
+-t filter -A OUTPUT -s 192.168.100.7 -j ACCEPT;
+-t nat -A OUTPUT -p tcp -j ACCEPT;
+-t nat -A POSTROUTING -i "ens33" -j ACCEPT;
+-t mangle -I FORDWARD 0 -m --state NEW -j REJECT;
+END_RULES
